@@ -5,8 +5,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title>Document</title>
-	<meta name="description" content="">
+	<title>Critter Contraption Control</title>
+	<meta name="description" content="Critter Contraption Control">
 	<meta name="author" content="Brandon Yee">
 
 	<!-- Load CSS frameworks from jsDelivr CDN. -->
@@ -69,16 +69,17 @@
 </head>
 <body>
 	<div class="container">
-		<!-- div.row>div.twelve.columns>h1{Critter Contraption}+h2{By Brandon Yee}+button#feed.button{Feed!}+p{Status: }>span#feedingStatus{Idle}^^^div.row>div.six.columns>table#scheduleList>tr>th>{Critter will be fed on:}^th>{On/Off}^th>i.fa.fa-trash-o^^^^div.six.columns>button#newTimer.button{Create New Scheduled Time}+div#timerSettings>h3{Scheduled Time Settings}+{Feed every }+select#daySelect>option[value=Sunday]{Sunday}+option[value=Monday]{Monday}+option[value=Tuesday]{Tuesday}+option[value=Wednesday]{Wednesday}+option[value=Thursday]{Thursday}+option[value=Friday]{Friday}+option[value=Saturday]{Saturday}+option[value=ed]{Every day}+option[value=eod]{Every other day}^{ at }+select#hourSelect>option[value=$]{$}*12^{:}+select#minutesSelect>option[value=$$@0]{$$@0}*60^{ }+select#ampmSelect>option[value=am]{am}+option[value=pm]{pm}^button#timerSet.button{Create Timer}^^^div.row>div.twelve.columns>img#modelPic.u-full-width -->
+		<!-- div.row>div.twelve.columns>h1{Critter Contraption}+h2{By Brandon Yee}+button#feed.button{Feed!}+button#showModelPics.button{Model Pictures}+p{Status: }>span#feedingStatus{Idle}^^^div#mainScheduleRow.row>div.six.columns>table#scheduleList>tr>th>{Critter will be fed on:}^th>{On/Off}^th>i.fa.fa-trash-o^^^^div.six.columns>button#newTimer.button{Create New Scheduled Time}+div#timerSettings>h3{Scheduled Time Settings}+{Feed every }+select#daySelect>option[value=Sunday]{Sunday}+option[value=Monday]{Monday}+option[value=Tuesday]{Tuesday}+option[value=Wednesday]{Wednesday}+option[value=Thursday]{Thursday}+option[value=Friday]{Friday}+option[value=Saturday]{Saturday}+option[value=ed]{Every day}+option[value=eod]{Every other day}^{ at }+select#hourSelect>option[value=$]{$}*12^{:}+select#minutesSelect>option[value=$$@0]{$$@0}*60^{ }+select#ampmSelect>option[value=am]{am}+option[value=pm]{pm}^button#timerSet.button{Create Timer}^^^div#modelPicRow.row>div.twelve.columns>p{Click on the picture or use arrow keys to navigate through the pictures.}+img#modelPic.u-full-width -->
 		<div class="row">
 			<div class="twelve columns">
 				<h1>Critter Contraption</h1>
 				<h2>By Brandon Yee</h2>
 				<button id="feed" class="button">Feed!</button>
+				<button id="showModelPics" class="button">Model Pictures</button>
 				<p>Status: <span id="feedingStatus">Idle</span></p>
 			</div>
 		</div>
-		<div class="row">
+		<div id="mainScheduleRow" class="row">
 			<div class="six columns">
 				<table id="scheduleList">
 					<tr>
@@ -183,8 +184,11 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="twelve columns"><img id="modelPic" src="" alt="" class="u-full-width"></div>
+		<div id="modelPicRow" class="row">
+			<div class="twelve columns">
+				<p>Click on the picture or use arrow keys to navigate through the pictures.</p>
+				<img src="" alt="" id="modelPic" class="u-full-width">
+			</div>
 		</div>
 	</div> <!-- CONTAINER ENDS HERE -->
 	<!-- JS goes here, don"t forget $(document).ready() -->
@@ -193,16 +197,29 @@
 		// Setup Variables
 		var socket = io.connect(),
 			fadeSpeed = 200,
+			curPic = 0,
+			maxPics = 5,
+			modelPics = [
+				"http://s32.postimg.org/ep94le9sl/Designs.jpg",
+				"http://s32.postimg.org/rxmr2xset/Designs_2.jpg",
+				"http://s32.postimg.org/rip9f5amt/Designs_3.jpg",
+				"http://s32.postimg.org/7lsixo6j9/Designs_4.jpg",
+				"http://s32.postimg.org/e4z5ftmvp/Designs_5.jpg"
+			],
 			$status = $("#feedingStatus"),
+			$mainScheduleRow = $("#mainScheduleRow"),
 			$scheduleList = $("#scheduleList"),
 			$newTimer = $("#newTimer"),
 			$timerSettings = $("#timerSettings"),
 			$timerSet = $("#timerSet"),
+			$modelPicRow = $("#modelPicRow"),
+			$modelPic = $("#modelPic"),
 			i;
 
 		// Setup Animations
 		$timerSettings.hide();
-		$modelPic.hide();
+		$modelPicRow.hide();
+		$modelPic.attr("src", modelPics[curPic]);
 
 		// Feed Button
 		$("#feed").click(function feedButtonDomClicked () {
@@ -211,8 +228,12 @@
 
 		// Create Timer
 		$newTimer.click(function newTimerDomClicked () {
-			$(this).prop("disabled", true);
-			$timerSettings.fadeIn(fadeSpeed);
+			// $(this).prop("disabled", true);
+			if ($timerSettings.is(":visible")) {
+				$timerSettings.fadeOut(fadeSpeed);
+			} else {
+				$timerSettings.fadeIn(fadeSpeed);
+			}
 		});
 		$timerSet.click(function timerSetDomClicked () {
 			// Store values of select>options.
@@ -227,7 +248,7 @@
 
 			// Animations.
 			$timerSettings.fadeOut(fadeSpeed);
-			$newTimer.prop("disabled", false);
+			// $newTimer.prop("disabled", false);
 		});
 
 		// Get Status
@@ -315,7 +336,45 @@
 			});
 		});
 
-		// Model Pictures
+		// Toggle Model Pictures
+		$("#showModelPics").click(function showModelPicsInner () {
+			if ($mainScheduleRow.is(":visible")) {
+				$mainScheduleRow.hide();
+				$modelPicRow.fadeIn(fadeSpeed);
+			} else {
+				$modelPicRow.hide();
+				$mainScheduleRow.fadeIn(fadeSpeed);
+			}
+		});
+
+		// Change Model Picture.
+		$modelPic.click(function modelPicClickedInner () {
+			if (curPic === (maxPics - 1)) {
+				curPic = 0;
+			} else {
+				curPic += 1;
+			}
+			$modelPic.attr("src", modelPics[curPic]);
+		});
+		$(document).keyup(function keyPressDetectedInner (e) {
+			e.preventDefault();
+			if (e.which === 39 || e.which === 40) {
+				if (curPic === (maxPics - 1)) {
+					curPic = 0;
+				} else {
+					curPic += 1;
+				}
+			}
+			if (e.which === 37 || e.which === 38) {
+				if (curPic === 0) {
+					curPic = (maxPics - 1);
+				} else {
+					curPic -= 1;
+				}
+			}
+			$modelPic.attr("src", modelPics[curPic]);
+		});
+		
 	});
 	</script>
 </body>
