@@ -42,7 +42,7 @@ board.on("ready", function arduinoControl () {
 	var button = new five.Button(8);
 	var servo = new five.Servo({
 		pin: 9,
-		range: [0, 155], // Default: 0-180 TODO change with new servo
+		range: [0, 155], // Default: 0-180
 		startAt: startDegree
 	});
 
