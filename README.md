@@ -3,7 +3,10 @@ This is a Node-based website used to control an Arduino. I used [Socket.io][1] a
 
 # Websites
 The project website is here: [https://sites.google.com/a/punahou.edu/byee20/][4]
+
 The CC Control website is here: [http://htmlpreview.github.io/?https://github.com/Firebird1029/CC-Control/blob/master/client.html][5]
+
+Note: The website above does not actually control a pet feeder. It is for demonstration features only. The buttons and Prototype Designs work, but I replaced all Socket.io functionality with regular functions.
 
 [1]: http://socket.io/ "http://socket.io/"
 [2]: http://johnny-five.io/ "http://johnny-five.io/"
